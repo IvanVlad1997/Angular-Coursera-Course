@@ -5,6 +5,7 @@ import { Location } from '@angular/common'
 import { DishService } from '../services/dish.service'
 import { switchMap} from 'rxjs/operators'
 
+import { FormBuilder, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'app-dishdetail',
@@ -21,7 +22,8 @@ export class DishdetailComponent implements OnInit {
 
   constructor(private dishservice: DishService,
     private location: Location,
-    private routes: ActivatedRoute) { }
+    private routes: ActivatedRoute,
+    private fb: FormBuilder) { }
 
   ngOnInit(): void { 
     this.dishservice.getDishIds()
@@ -42,4 +44,30 @@ export class DishdetailComponent implements OnInit {
     this.location.back();
   }
 
-}
+  altceva = this.fb.group({
+    prop1: [''],
+    aliases: this.fb.array([
+      this.fb.control('')
+    ])
+  })
+
+  get aliases() {
+    return this.altceva.get('aliases') as FormArray;
+  }
+
+  addAlias() {
+    this.aliases.push(this.fb.control(''));
+  }
+
+  
+  //  profileForm = this.fb.group({
+  //    firstName: [''],
+  //    lastName: [''],
+  //  })
+
+    onSubmit() {
+      console.log(this.altceva.value)
+    }
+  };
+ 
+
