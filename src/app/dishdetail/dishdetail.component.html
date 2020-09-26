@@ -41,38 +41,38 @@
             <mat-list-item> -- {{comment.author}} {{comment.date | date}} </mat-list-item>
          </mat-list>
      
-            <!-- <form [formGroup] = "profileForm" (ngSubmit) ="onSubmit()">
-                <input type="text" formControlName="firstName">
-                <input type="text" formControlName="lastName">
-                <button type="submit" 
-                [disabled] ="!profileForm.valid">Submit</button>
-            </form> -->
-
-            <form [formGroup] = "altceva">
-                <input type="text" formControlName="prop1">
-                <div formArrayName="aliases"  >
-                    <h3>Aliases</h3> <button (click)="addAlias()">Add Alias</button>
-                  
-                    <div *ngFor="let alias of aliases.controls; let i=index">
-                      <!-- The repeated alias template -->
-                      <label>
-                        Alias:
-                        <input type="text" [formControlName]="i">
-                      </label>
-                    </div>
-                  </div>
-                 
-            </form>
+        <h3>Leave a comment</h3>
+        <p>{{leaveComment.value | json}} {{leaveComment.status | json}}</p>
+        <form novalidate [formGroup] = "leaveComment" (ngSubmit)="onSubmit()">
             <p>
-                Value: {{altceva.value | json}}
-                
+                <mat-form-field class="half-width">
+                    <input matInput formControlName="author"
+                    placeholder="Author" type="text" required>
+                    <mat-error *ngIf="formErrors.author">
+                        {{formErrors.author}}                        
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="half-width">
+                    <input matInput formControlName="rating"
+                    placeholder="Rating" type="number" required>
+                   
+                </mat-form-field>
+
+                <mat-form-field class="half-width">
+                    <input matInput formControlName="comment"
+                    placeholder="Comment" type="textarea" required>
+                    <mat-error *ngIf="formErrors.comment">
+                        {{formErrors.comment}}                        
+                    </mat-error>
+                </mat-form-field>
+
+
+                <button type="submit" mat-button class="background-primary text-floral-white"
+              [disabled]="leaveComment.invalid"
+              >Submit</button>
             </p>
-            <!-- <p>
-                <button (click) = "updateName()">Update Name</button>
-            </p> -->
-      
-      
-  
+        </form>
   </div>
   
 

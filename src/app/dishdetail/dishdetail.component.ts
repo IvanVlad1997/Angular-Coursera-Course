@@ -4,8 +4,9 @@ import { Params, ActivatedRoute } from '@angular/router'
 import { Location } from '@angular/common'
 import { DishService } from '../services/dish.service'
 import { switchMap} from 'rxjs/operators'
+import { Comment } from '../shared/comment'
 
-import { FormBuilder, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-dishdetail',
@@ -14,16 +15,52 @@ import { FormBuilder, FormArray } from '@angular/forms';
 })
 export class DishdetailComponent implements OnInit {
   
+  leaveComment: FormGroup;
+  comment: Comment;
  
+
+
   dish: Dish;
   dishIds : string[];
   prev: string;
   next: string;
 
+
+  formErrors = {
+    'author':'',
+    'comment':'',
+    
+  }
+
+  validationMessages = {
+    'author': {
+      'required': 'Author is required'
+    },
+    'comment': {
+      'required': 'Comment is required'
+    }
+  }
+
   constructor(private dishservice: DishService,
     private location: Location,
     private routes: ActivatedRoute,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder) { 
+      this.createForm()
+    }
+
+    onSubmit() {
+     
+      this.comment = this.leaveComment.value;
+      console.log(this.comment);
+      this.leaveComment.reset({
+        author: '',
+        comment: '',
+        date: '',
+        rating: 5
+      })
+    
+    }
+
 
   ngOnInit(): void { 
     this.dishservice.getDishIds()
@@ -44,30 +81,44 @@ export class DishdetailComponent implements OnInit {
     this.location.back();
   }
 
-  altceva = this.fb.group({
-    prop1: [''],
-    aliases: this.fb.array([
-      this.fb.control('')
-    ])
-  })
+  createForm() {
+    this.leaveComment = this.fb.group ({
+      author: ['', [Validators.required]],
+      comment: ['', [Validators.required]],
+      rating: 5,
+      date: new Date(),
+    })
 
-  get aliases() {
-    return this.altceva.get('aliases') as FormArray;
+    this.leaveComment.valueChanges
+      .subscribe(data => this.onValueChanged(data))
+    
+    this.onValueChanged()
   }
 
-  addAlias() {
-    this.aliases.push(this.fb.control(''));
-  }
-
-  
-  //  profileForm = this.fb.group({
-  //    firstName: [''],
-  //    lastName: [''],
-  //  })
-
-    onSubmit() {
-      console.log(this.altceva.value)
+  onValueChanged(data?: any) {
+    if(!this.leaveComment) {
+      return;
     }
+    const form= this.leaveComment;
+    for(const field in this.formErrors) {
+      if (this.formErrors.hasOwnProperty(field)){
+        this.formErrors[field] ='';
+        const control = form.get(field);
+        if (control && control.dirty &&!control.valid) {
+          const messages = this.validationMessages[field];
+          for (const key in control.errors) {
+            if (control.errors.hasOwnProperty(key)) {
+              this.formErrors[field] += messages[key] + ' ';
+            }
+          }
+        } 
+      }
+    }
+  }
+
+ 
+ 
+
   };
  
 
