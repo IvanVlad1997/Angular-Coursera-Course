@@ -24,6 +24,9 @@ export class DishdetailComponent implements OnInit {
   dishIds : string[];
   prev: string;
   next: string;
+  dishcopy: Dish;
+
+  errMess: string;
 
 
   formErrors = {
@@ -31,15 +34,17 @@ export class DishdetailComponent implements OnInit {
     'comment':'',
     
   }
-
   validationMessages = {
     'author': {
-      'required': 'Author is required'
-    },
+      'required': 'Author is required.' ,
+      'minlength': 'Author must be at least 2 characters long.'
+    } ,
     'comment': {
-      'required': 'Comment is required'
-    }
-  }
+      'required': 'comment is required.' ,
+      'minlength': 'comment must be at least 2 characters long.'
+    } ,
+  };
+
 
   constructor(private dishservice: DishService,
     private location: Location,
@@ -52,6 +57,20 @@ export class DishdetailComponent implements OnInit {
      
       this.comment = this.leaveComment.value;
       console.log(this.comment);
+
+      this.dishcopy.comments.push(this.comment);
+      // this.dishservice.putDish(this.dishcopy)
+      //   .subscribe(dish => {
+      //     this.dish = dish;
+      //     this.dishcopy = dish;
+      //   },
+      //   errmess => {
+      //     this.dish = null,
+      //     this.dishcopy = null,
+      //     this.errMess = <any>errmess;
+      //   })
+
+
       this.leaveComment.reset({
         author: '',
         comment: '',
@@ -59,6 +78,7 @@ export class DishdetailComponent implements OnInit {
         rating: 5
       })
     
+   
     }
 
 
@@ -68,7 +88,11 @@ export class DishdetailComponent implements OnInit {
 
     this.routes.params
        .pipe(switchMap((params:Params) => this.dishservice.getDish(params['id'])))
-       .subscribe(dish =>  {this.dish = dish; this.setPrevNext(dish.id)});
+       .subscribe(dish =>  {this.dish = dish; 
+                            this.setPrevNext(dish.id)
+                            this.dishcopy = dish
+                          },
+                          errmess => this.errMess = <any>errmess);
   }
 
   setPrevNext(dishId: string) {
@@ -83,7 +107,7 @@ export class DishdetailComponent implements OnInit {
 
   createForm() {
     this.leaveComment = this.fb.group ({
-      author: ['', [Validators.required]],
+      author: ['', [Validators.required, Validators.minLength(2)]],
       comment: ['', [Validators.required]],
       rating: 5,
       date: new Date(),
