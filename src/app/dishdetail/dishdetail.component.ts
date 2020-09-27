@@ -59,6 +59,7 @@ export class DishdetailComponent implements OnInit {
       console.log(this.comment);
 
       this.dishcopy.comments.push(this.comment);
+      localStorage.setItem(`${this.dishcopy.id}`, JSON.stringify(this.dishcopy));
       // this.dishservice.putDish(this.dishcopy)
       //   .subscribe(dish => {
       //     this.dish = dish;
@@ -88,9 +89,20 @@ export class DishdetailComponent implements OnInit {
 
     this.routes.params
        .pipe(switchMap((params:Params) => this.dishservice.getDish(params['id'])))
-       .subscribe(dish =>  {this.dish = dish; 
-                            this.setPrevNext(dish.id)
-                            this.dishcopy = dish
+       .subscribe(dish =>  { 
+                            const retrievedObject = localStorage.getItem(`${dish.id}`);
+                            if (retrievedObject) {
+                              console.log('retrievedObject: ', JSON.parse(retrievedObject));
+                              this.dish = JSON.parse(retrievedObject); 
+                              this.dishcopy = JSON.parse(retrievedObject);
+                            }
+                            else {
+                              this.dish = dish; 
+                              this.dishcopy = dish;
+                            }
+                           
+                            this.setPrevNext(dish.id);
+                            
                           },
                           errmess => this.errMess = <any>errmess);
   }
